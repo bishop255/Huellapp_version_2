@@ -1,12 +1,19 @@
 package com.example.huellapp.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.huellapp.model.Paseador
+import androidx.lifecycle.viewModelScope
+import com.example.huellapp.model.EstadoPaseo
 import com.example.huellapp.model.Paseo
 import com.example.huellapp.repository.PaseoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,41 +21,70 @@ class PaseoViewModel @Inject constructor(
     private val repository: PaseoRepository
 ) : ViewModel() {
 
-    // Paseo en curso
-    var paseoActivo = mutableStateOf<Paseo?>(null)
-        private set
+    // Observar todos los paseos
+    private val _allPaseos = repository.getAllPaseos()
 
-    // Historial (se mantiene en memoria con Compose)
-    var historial = mutableStateListOf<Paseo>()
-        private set
-
-    // Inicia un paseo nuevo
-    fun iniciarPaseo(paseador: Paseador, perro: String) {
-        val codigo = "HX-${(1000..9999).random()}"
-
-        paseoActivo.value = Paseo(
-            codigo = codigo,
-            paseador = paseador,
-            perro = perro
-        )
+    // Paseos activos (EN_CURSO)
+    val paseosActivos: Flow<List<Paseo>> = _allPaseos.map { paseos ->
+        paseos.filter { it.estado == EstadoPaseo.EN_CURSO.name }
     }
 
-    // Suma 1 segundo al paseo
-    fun actualizarTiempo() {
-        paseoActivo.value?.let {
-            paseoActivo.value = it.copy(
-                tiempoTranscurrido = it.tiempoTranscurrido + 1
-            )
+    // Historial (COMPLETADO)
+    val historial: Flow<List<Paseo>> = _allPaseos.map { paseos ->
+        paseos.filter { it.estado == EstadoPaseo.COMPLETADO.name }
+    }
+
+    // Estado de mensaje
+    private val _mensaje = MutableStateFlow<String?>(null)
+    val mensaje: StateFlow<String?> = _mensaje.asStateFlow()
+
+    fun iniciarPaseo(
+        paseadorId: Int,
+        perroId: Int,
+        perroNombre: String,
+        duracionMinutos: Int = 60
+    ) {
+        viewModelScope.launch {
+            try {
+                val codigo = generarCodigoPaseo()
+                val ahora = System.currentTimeMillis()
+                val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(ahora))
+
+                repository.guardarPaseo(
+                    codigo = codigo,
+                    paseadorId = paseadorId,
+                    perroId = perroId,
+                    duracion = duracionMinutos * 60, // Convertir a segundos
+                    fecha = ahora,
+                    hora = horaActual,
+                    estado = EstadoPaseo.EN_CURSO.name
+                )
+
+                _mensaje.value = "Paseo iniciado: $codigo"
+            } catch (e: Exception) {
+                _mensaje.value = "Error al iniciar paseo: ${e.message}"
+            }
         }
     }
 
-    // Finaliza paseo y lo guarda en el historial
-    fun finalizarPaseo() {
-        paseoActivo.value?.let { p ->
-            val final = p.copy(finalizado = true)
-            historial.add(final)
-            paseoActivo.value = final
+    fun finalizarPaseo(paseoId: Int) {
+        viewModelScope.launch {
+            try {
+                // Usa el nuevo método del repository
+                repository.actualizarEstadoPaseo(paseoId, EstadoPaseo.COMPLETADO.name)
+                _mensaje.value = "Paseo finalizado exitosamente"
+            } catch (e: Exception) {
+                _mensaje.value = "Error al finalizar paseo: ${e.message}"
+            }
         }
+    }
+
+    fun limpiarMensaje() {
+        _mensaje.value = null
+    }
+
+    private fun generarCodigoPaseo(): String {
+        val timestamp = System.currentTimeMillis()
+        return "P${timestamp.toString().takeLast(6)}"
     }
 }
-

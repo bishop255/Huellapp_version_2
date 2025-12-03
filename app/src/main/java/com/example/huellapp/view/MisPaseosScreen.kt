@@ -38,19 +38,57 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.huellapp.model.EstadoPaseo
 import com.example.huellapp.model.Paseo
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisPaseosScreen() {
     val paseos = remember {
         listOf(
-            Paseo("1", "Carlos Rodríguez", "Chris", "15 Nov", "10:00", 60, EstadoPaseo.PROGRAMADO, perroId = 1),
-            Paseo("2", "Danae Guerrero", "Hachi", "14 Nov", "16:30", 45, EstadoPaseo.COMPLETADO, perroId = 2),
-            Paseo("3", "Juan Pérez", "Rocky", "13 Nov", "09:00", 30, EstadoPaseo.COMPLETADO, perroId = 3),
-            Paseo("4", "Ana Martínez", "Chris", "12 Nov", "15:00", 60, EstadoPaseo.COMPLETADO, perroId = 1)
+            Paseo(
+                id = 1,
+                codigo = "P001",
+                paseadorId = 1,
+                perroId = 1,
+                duracionSegundos = 3600, // 60 minutos
+                fecha = System.currentTimeMillis(),
+                hora = "10:00",
+                estado = EstadoPaseo.PROGRAMADO.name
+            ),
+            Paseo(
+                id = 2,
+                codigo = "P002",
+                paseadorId = 2,
+                perroId = 2,
+                duracionSegundos = 2700, // 45 minutos
+                fecha = System.currentTimeMillis() - 86400000, // Ayer
+                hora = "16:30",
+                estado = EstadoPaseo.COMPLETADO.name
+            ),
+            Paseo(
+                id = 3,
+                codigo = "P003",
+                paseadorId = 3,
+                perroId = 3,
+                duracionSegundos = 1800, // 30 minutos
+                fecha = System.currentTimeMillis() - 172800000, // Hace 2 días
+                hora = "09:00",
+                estado = EstadoPaseo.COMPLETADO.name
+            ),
+            Paseo(
+                id = 4,
+                codigo = "P004",
+                paseadorId = 4,
+                perroId = 1,
+                duracionSegundos = 3600, // 60 minutos
+                fecha = System.currentTimeMillis() - 259200000, // Hace 3 días
+                hora = "15:00",
+                estado = EstadoPaseo.COMPLETADO.name
+            )
         )
     }
-
 
     Scaffold(
         topBar = {
@@ -78,12 +116,21 @@ fun MisPaseosScreen() {
 
 @Composable
 fun PaseoCard(paseo: Paseo) {
-    val estadoColor = when (paseo.estado) {
+    val estadoPaseo = EstadoPaseo.valueOf(paseo.estado)
+
+    val estadoColor = when (estadoPaseo) {
         EstadoPaseo.PROGRAMADO -> MaterialTheme.colorScheme.primary
         EstadoPaseo.EN_CURSO -> MaterialTheme.colorScheme.tertiary
         EstadoPaseo.COMPLETADO -> MaterialTheme.colorScheme.secondary
         EstadoPaseo.CANCELADO -> MaterialTheme.colorScheme.error
     }
+
+    // Convertir fecha timestamp a formato legible
+    val dateFormat = SimpleDateFormat("dd MMM", Locale("es", "ES"))
+    val fechaFormateada = dateFormat.format(Date(paseo.fecha))
+
+    // Convertir duración de segundos a minutos
+    val duracionMinutos = paseo.duracionSegundos / 60
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -100,7 +147,7 @@ fun PaseoCard(paseo: Paseo) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = paseo.perroNombre,
+                    text = "Perro ID: ${paseo.perroId}", // Aquí deberías obtener el nombre del perro
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -109,7 +156,12 @@ fun PaseoCard(paseo: Paseo) {
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
-                        text = paseo.estado.name,
+                        text = when (estadoPaseo) {
+                            EstadoPaseo.PROGRAMADO -> "Programado"
+                            EstadoPaseo.EN_CURSO -> "En Curso"
+                            EstadoPaseo.COMPLETADO -> "Completado"
+                            EstadoPaseo.CANCELADO -> "Cancelado"
+                        },
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = estadoColor
@@ -128,7 +180,7 @@ fun PaseoCard(paseo: Paseo) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = paseo.paseadorNombre,
+                    text = "Paseador ID: ${paseo.paseadorId}", // Aquí deberías obtener el nombre
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -149,7 +201,7 @@ fun PaseoCard(paseo: Paseo) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${paseo.fecha} • ${paseo.hora}",
+                        text = "$fechaFormateada • ${paseo.hora}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -163,13 +215,13 @@ fun PaseoCard(paseo: Paseo) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${paseo.duracion} min",
+                        text = "$duracionMinutos min",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
 
-            if (paseo.estado == EstadoPaseo.PROGRAMADO) {
+            if (estadoPaseo == EstadoPaseo.PROGRAMADO) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),

@@ -24,6 +24,12 @@ interface PaseoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPaseos(paseos: List<Paseo>)
 
+    @Update
+    suspend fun updatePaseo(paseo: Paseo) // Agrega este método
+
+    @Query("UPDATE paseos SET estado = :estado WHERE id = :paseoId") // Agrega este método
+    suspend fun updateEstado(paseoId: Int, estado: String)
+
     @Query("DELETE FROM paseos")
     suspend fun deleteAllPaseos()
 }

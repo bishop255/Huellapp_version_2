@@ -4,6 +4,8 @@ import com.example.huellapp.DAO.PaseoDao
 import com.example.huellapp.model.Paseo
 import com.example.huellapp.model.EstadoPaseo
 import kotlinx.coroutines.flow.Flow
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,19 +26,18 @@ class PaseoRepository @Inject constructor(
 
     suspend fun guardarPaseo(
         codigo: String,
-        paseadorId: Int,     // Cambiado de String a Int
-        perroId: Int,        // Cambiado de String a Int
+        paseadorId: Int,
+        perroId: Int,
         duracion: Int,
         fecha: Long = System.currentTimeMillis(),
-        hora: String = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date()),
+        hora: String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date()),
         estado: String = EstadoPaseo.PROGRAMADO.name
     ) {
         dao.insertPaseo(
             Paseo(
                 codigo = codigo,
-                paseadorId = paseadorId,  // Usa paseadorId
-                perroId = perroId,        // Usa perroId
+                paseadorId = paseadorId,
+                perroId = perroId,
                 duracionSegundos = duracion,
                 fecha = fecha,
                 hora = hora,
@@ -47,6 +48,10 @@ class PaseoRepository @Inject constructor(
 
     suspend fun insertPaseo(paseo: Paseo) {
         dao.insertPaseo(paseo)
+    }
+
+    suspend fun actualizarEstadoPaseo(paseoId: Int, nuevoEstado: String) {
+        dao.updateEstado(paseoId, nuevoEstado)
     }
 
     suspend fun deleteAllPaseos() {
