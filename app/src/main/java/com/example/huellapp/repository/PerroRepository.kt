@@ -3,8 +3,11 @@ package com.example.huellapp.repository
 import com.example.huellapp.DAO.PerroDao
 import com.example.huellapp.model.Perro
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PerroRepository(private val perroDao: PerroDao) {
+@Singleton
+class PerroRepository @Inject constructor(private val perroDao: PerroDao) {
 
     val perros: Flow<List<Perro>> = perroDao.obtenerPerros()
 

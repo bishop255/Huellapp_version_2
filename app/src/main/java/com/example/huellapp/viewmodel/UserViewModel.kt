@@ -3,7 +3,9 @@ package com.example.huellapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huellapp.model.Usuario
-import com.example.huellapp.repository.UserRepository
+import com.example.huellapp.model.remote.RegisterRequest
+import com.example.huellapp.repository.AuthRepository  // CAMBIADO
+import com.example.huellapp.session.UserSession
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,14 +15,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val authRepository: AuthRepository  // USA AuthRepository en lugar de UserRepository
 ) : ViewModel() {
 
-    // Estados para Login
     private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val loginState: StateFlow<LoginUiState> = _loginState.asStateFlow()
 
-    // Estados para Registro
     private val _registerState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
     val registerState: StateFlow<RegisterUiState> = _registerState.asStateFlow()
 
@@ -33,11 +33,22 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _loginState.value = LoginUiState.Loading
             try {
-                val usuario = userRepository.login(email, password)
-                if (usuario != null) {
+                val response = authRepository.login(email, password)  // LLAMADA AL BACKEND
+
+                if (response.estado == "exito" && response.usuario != null) {
+                    // Guardar en sesión
+                    val usuario = Usuario(
+                        id = 0,
+                        nombre = response.usuario.nombre,
+                        email = response.usuario.email,
+                        password = "",
+                        telefono = ""
+                    )
+                    UserSession.usuarioLogueado = usuario
+
                     _loginState.value = LoginUiState.Success(usuario)
                 } else {
-                    _loginState.value = LoginUiState.Error("Credenciales incorrectas")
+                    _loginState.value = LoginUiState.Error(response.mensaje ?: "Credenciales incorrectas")
                 }
             } catch (e: Exception) {
                 _loginState.value = LoginUiState.Error(e.message ?: "Error desconocido")
@@ -64,18 +75,29 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             _registerState.value = RegisterUiState.Loading
             try {
-                val usuario = Usuario(
-                    id = 0,
-                    nombre = nombre,
+                val request = RegisterRequest(
                     email = email,
                     password = password,
-                    telefono = telefono
+                    nombre = nombre,
+                    telefono = telefono,
+                    direccionPrincipal = null,
+                    preferencias = null,
+                    contactoEmergencia = null
                 )
-                val success = userRepository.register(usuario)
-                if (success) {
+
+                val response = authRepository.register(request)  // LLAMADA AL BACKEND
+
+                if (response.estado == "exito") {
+                    val usuario = Usuario(
+                        id = 0,
+                        nombre = nombre,
+                        email = email,
+                        password = "",
+                        telefono = telefono
+                    )
                     _registerState.value = RegisterUiState.Success(usuario)
                 } else {
-                    _registerState.value = RegisterUiState.Error("El usuario ya existe")
+                    _registerState.value = RegisterUiState.Error(response.mensaje)
                 }
             } catch (e: Exception) {
                 _registerState.value = RegisterUiState.Error(e.message ?: "Error al registrar")
@@ -92,7 +114,6 @@ class UserViewModel @Inject constructor(
     }
 }
 
-// ===== Estados para Login =====
 sealed class LoginUiState {
     object Idle : LoginUiState()
     object Loading : LoginUiState()
@@ -100,7 +121,6 @@ sealed class LoginUiState {
     data class Error(val message: String) : LoginUiState()
 }
 
-// ===== Estados para Registro =====
 sealed class RegisterUiState {
     object Idle : RegisterUiState()
     object Loading : RegisterUiState()

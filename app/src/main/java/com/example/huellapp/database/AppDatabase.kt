@@ -6,11 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.huellapp.DAO.PaseoDao
 import com.example.huellapp.DAO.PerroDao
+import com.example.huellapp.DAO.UserDao
 import com.example.huellapp.model.Paseo
 import com.example.huellapp.model.Perro
+import com.example.huellapp.model.Usuario
 
 @Database(
-    entities = [Perro::class, Paseo::class], // ✅ TODAS LAS ENTIDADES AQUÍ
+    entities = [Perro::class, Paseo::class, Usuario::class],
     version = 1,
     exportSchema = false
 )
@@ -18,6 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun perroDao(): PerroDao
     abstract fun paseoDao(): PaseoDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
@@ -30,9 +33,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "huellapp_db"
                 )
-                    .fallbackToDestructiveMigration() // útil durante desarrollo
+                    .fallbackToDestructiveMigration()
                     .build()
-
                 INSTANCE = instance
                 instance
             }

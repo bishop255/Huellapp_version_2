@@ -1,33 +1,25 @@
 package com.example.huellapp.view
 
 import MisPerrosScreen
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-
-import androidx.compose.runtime.collectAsState
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.huellapp.viewmodel.PerroViewModel
 import com.example.huellapp.viewmodel.PerroViewModelFactory
+import com.example.huellapp.viewmodel.PaseoViewModel
+import com.example.huellapp.viewmodel.UserViewModel
 import com.example.huellapp.repository.PerroRepository
 import com.example.huellapp.database.AppDatabase
-import com.example.huellapp.view.MisPaseosScreen
-import com.example.huellapp.view.PerfilScreen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.QrCode
-import androidx.compose.ui.Alignment
-import com.example.huellapp.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,17 +32,16 @@ fun MainScreenDueno(navController: NavHostController) {
     val factory = remember { PerroViewModelFactory(repository) }
 
     val perroViewModel: PerroViewModel = viewModel(factory = factory)
-
-    // NUEVO
-    val userViewModel: UserViewModel = viewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    val paseoViewModel: PaseoViewModel = hiltViewModel()
 
     val listaPerros by perroViewModel.perros.collectAsState()
-    val listaNombresPerros = listaPerros.mapNotNull { it.nombre }
+    val listaNombresPerros = listaPerros.map { it.nombre }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Panel del Dueño") },
+                title = { Text("HuellApp") },
                 actions = {
                     IconButton(onClick = {
                         navController.navigate("qr")
@@ -62,22 +53,43 @@ fun MainScreenDueno(navController: NavHostController) {
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigationBar(bottomNavController)
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+        NavHost(
+            navController = bottomNavController,
+            startDestination = "mis_perros",
+            modifier = Modifier.padding(padding)
         ) {
-            Text("Pantalla principal del dueño")
+            composable("mis_perros") {
+                MisPerrosScreen()
+            }
+
+            composable("paseadores") {
+                PaseadoresScreen(
+                    listaPerros = listaNombresPerros,
+                    paseoViewModel = paseoViewModel
+                )
+            }
+
+            composable("mis_paseos") {
+                MisPaseosScreen()
+            }
+
+            composable("perfil") {
+                PerfilScreen(
+                    navController = navController, // Usa el navController principal
+                    userViewModel = userViewModel
+                )
+            }
         }
     }
 }
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-
     val items = listOf(
         BottomNavItem("Mis Perros", Icons.Filled.Pets, "mis_perros"),
         BottomNavItem("Paseadores", Icons.Filled.DirectionsWalk, "paseadores"),

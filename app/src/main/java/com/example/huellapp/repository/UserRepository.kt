@@ -1,6 +1,6 @@
 package com.example.huellapp.repository
 
-import com.example.huellapp.dao.UserDao
+import com.example.huellapp.DAO.UserDao
 import com.example.huellapp.model.Usuario
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +17,7 @@ class UserRepository @Inject constructor(
         return try {
             val existingUser = userDao.getUserByEmail(usuario.email)
             if (existingUser != null) {
-                false // Usuario ya existe
+                false
             } else {
                 userDao.insert(usuario)
                 true

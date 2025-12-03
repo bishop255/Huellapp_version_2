@@ -1,4 +1,4 @@
-package com.example.huellapp.dao
+package com.example.huellapp.DAO
 
 import androidx.room.*
 import com.example.huellapp.model.Usuario
