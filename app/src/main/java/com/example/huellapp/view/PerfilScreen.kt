@@ -96,7 +96,7 @@ fun PerfilScreen(navController: NavHostController, userViewModel: UserViewModel)
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // 🔥 Cerrar sesión REAL
+
             OutlinedButton(
                 onClick = {
                     UserSession.cerrarSesion()

@@ -28,7 +28,7 @@ fun RegisterScreen(
 ) {
     val registerState by viewModel.registerState.collectAsState()
 
-    // Variables de estado
+
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
@@ -46,7 +46,7 @@ fun RegisterScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Contenido principal
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -55,7 +55,7 @@ fun RegisterScreen(
         ) {
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Logo
+
             Image(
                 painter = painterResource(id = R.drawable.paw_logo),
                 contentDescription = "Logo HuellApp",
@@ -72,7 +72,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Campos de texto
+
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it },
@@ -168,7 +168,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Mostrar errores
+
             when (registerState) {
                 is RegisterUiState.Error -> {
                     val error = (registerState as RegisterUiState.Error).message
@@ -196,7 +196,7 @@ fun RegisterScreen(
                 else -> {}
             }
 
-            // Botón de registro
+
             Button(
                 onClick = {
                     if (password == confirmarPassword) {
@@ -227,7 +227,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Texto para volver al login
+
             TextButton(onClick = { navController.navigate("login") }) {
                 Text("¿Ya tienes cuenta? Inicia sesión")
             }

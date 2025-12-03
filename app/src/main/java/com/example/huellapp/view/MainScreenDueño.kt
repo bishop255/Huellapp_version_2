@@ -80,7 +80,7 @@ fun MainScreenDueno(navController: NavHostController) {
 
             composable("perfil") {
                 PerfilScreen(
-                    navController = navController, // Usa el navController principal
+                    navController = navController,
                     userViewModel = userViewModel
                 )
             }

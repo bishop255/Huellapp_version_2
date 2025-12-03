@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    // 1. Provee la Base de Datos (Singleton)
+
     @Provides
     @Singleton
     fun provideDatabase(
@@ -31,19 +31,19 @@ object DatabaseModule {
             .fallbackToDestructiveMigration()
             .build()
 
-    // 2. Provee el UserDao
+
     @Provides
     fun provideUserDao(
         db: AppDatabase
     ): UserDao = db.userDao()
 
-    // 3. Provee el PaseoDao (¡SOLUCIONA EL ERROR ORIGINAL!)
+
     @Provides
     fun providePaseoDao(
         db: AppDatabase
     ): PaseoDao = db.paseoDao()
 
-    // 4. Provee el PerroDao (Asumiendo que también se usará en un Repository)
+
     @Provides
     fun providePerroDao(
         db: AppDatabase

@@ -130,9 +130,7 @@ fun MisPerrosScreen() {
     }
 }
 
-// ---------------------------------------
-// Diálogo para agregar perro
-// ---------------------------------------
+
 @Composable
 fun AgregarPerroDialog(
     onDismiss: () -> Unit,
@@ -171,7 +169,7 @@ fun AgregarPerroDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Selector de foto
+
                 Box(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
@@ -269,7 +267,7 @@ fun AgregarPerroDialog(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botones
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -302,9 +300,7 @@ fun AgregarPerroDialog(
     }
 }
 
-// ---------------------------------------
-// Card para mostrar perro
-// ---------------------------------------
+
 @Composable
 fun PerroCard(perro: Perro, onDelete: () -> Unit) {
     var showDeleteDialog by remember { mutableStateOf(false) }

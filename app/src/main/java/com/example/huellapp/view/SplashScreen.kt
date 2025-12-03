@@ -30,7 +30,7 @@ fun SplashScreen(navController: NavHostController) {
         }
     }
 
-    // Espera 2.5 segundos y navega a Login
+
     LaunchedEffect(Unit) {
         delay(2500)
         navController.navigate("welcome") {

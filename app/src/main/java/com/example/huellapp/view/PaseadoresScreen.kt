@@ -29,7 +29,7 @@ fun PaseadoresScreen(
     listaPerros: List<String>,
     paseoViewModel: PaseoViewModel
 ) {
-    // Observar estados del ViewModel
+
     val paseosActivos by paseoViewModel.paseosActivos.collectAsState(initial = emptyList())
     val historial by paseoViewModel.historial.collectAsState(initial = emptyList())
 
@@ -43,7 +43,6 @@ fun PaseadoresScreen(
         )
     }
 
-    // Estados locales
     var mostrarSeleccionPerro by remember { mutableStateOf(false) }
     var perroSeleccionado by remember { mutableStateOf<String?>(null) }
     var paseadorSeleccionado by remember { mutableStateOf<Paseador?>(null) }
@@ -82,7 +81,7 @@ fun PaseadoresScreen(
                 item { Spacer(Modifier.height(16.dp)) }
             }
 
-            // Lista de paseadores
+
             item {
                 Text(
                     "Paseadores Disponibles",
@@ -123,7 +122,7 @@ fun PaseadoresScreen(
         }
     }
 
-    // Diálogo de selección de perro
+
     if (mostrarSeleccionPerro) {
         AlertDialog(
             onDismissRequest = { mostrarSeleccionPerro = false },
@@ -249,7 +248,7 @@ fun PaseoEnCursoCard(paseo: Paseo, viewModel: PaseoViewModel) {
             delay(1000)
             tiempoTranscurrido++
 
-            // Auto finalizar después de la duración programada
+
             if (tiempoTranscurrido >= paseo.duracionSegundos) {
                 viewModel.finalizarPaseo(paseo.id)
             }

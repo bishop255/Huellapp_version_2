@@ -21,20 +21,20 @@ class PaseoViewModel @Inject constructor(
     private val repository: PaseoRepository
 ) : ViewModel() {
 
-    // Observar todos los paseos
+
     private val _allPaseos = repository.getAllPaseos()
 
-    // Paseos activos (EN_CURSO)
+
     val paseosActivos: Flow<List<Paseo>> = _allPaseos.map { paseos ->
         paseos.filter { it.estado == EstadoPaseo.EN_CURSO.name }
     }
 
-    // Historial (COMPLETADO)
+
     val historial: Flow<List<Paseo>> = _allPaseos.map { paseos ->
         paseos.filter { it.estado == EstadoPaseo.COMPLETADO.name }
     }
 
-    // Estado de mensaje
+
     private val _mensaje = MutableStateFlow<String?>(null)
     val mensaje: StateFlow<String?> = _mensaje.asStateFlow()
 
@@ -54,7 +54,7 @@ class PaseoViewModel @Inject constructor(
                     codigo = codigo,
                     paseadorId = paseadorId,
                     perroId = perroId,
-                    duracion = duracionMinutos * 60, // Convertir a segundos
+                    duracion = duracionMinutos * 60,
                     fecha = ahora,
                     hora = horaActual,
                     estado = EstadoPaseo.EN_CURSO.name

@@ -28,11 +28,9 @@ class DefaultTokenProvider @Inject constructor() : TokenProvider {
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    // USA ESTA URL PARA EMULADOR ANDROID
     private const val BASE_URL = "http://10.0.2.2:8080/"
 
-    // SI USAS DISPOSITIVO FÍSICO, USA LA IP DE TU PC:
-    // private const val BASE_URL = "http://192.168.1.X:8080/"
+
 
     @Provides
     @Singleton

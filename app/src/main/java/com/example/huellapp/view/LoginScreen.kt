@@ -30,7 +30,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // Reset state cuando se sale de la pantalla
+
     DisposableEffect(Unit) {
         onDispose {
             viewModel.resetLoginState()

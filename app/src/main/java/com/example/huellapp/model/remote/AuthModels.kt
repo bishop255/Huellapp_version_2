@@ -1,6 +1,6 @@
 package com.example.huellapp.model.remote
 
-// LOGIN
+
 data class LoginRequest(
     val email: String,
     val password: String
@@ -17,7 +17,7 @@ data class UsuarioBackend(
     val email: String
 )
 
-// REGISTRO
+
 data class RegisterRequest(
     val email: String,
     val password: String,
