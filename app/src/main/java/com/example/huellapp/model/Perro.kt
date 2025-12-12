@@ -1,9 +1,7 @@
 package com.example.huellapp.model
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.UUID
 
 @Entity(tableName = "perro")
 data class Perro(
@@ -12,7 +10,7 @@ data class Perro(
     val nombre: String,
     val raza: String,
     val edad: Int,
-    val peso: Float,
+    val peso: Double,
     val temperamento: String,
     val fotoUri: String? = null
 

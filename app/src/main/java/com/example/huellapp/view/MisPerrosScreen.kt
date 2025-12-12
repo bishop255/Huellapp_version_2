@@ -284,7 +284,7 @@ fun AgregarPerroDialog(
                                     nombre = nombre.trim(),
                                     raza = raza.trim(),
                                     edad = edad.toInt(),
-                                    peso = peso.toFloat(),
+                                    peso = peso.toDouble(),
                                     temperamento = temperamento.trim().ifBlank { "Sin especificar" },
                                     fotoUri = fotoUri?.toString()
                                 )
